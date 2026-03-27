@@ -1,7 +1,10 @@
 package main
 
 import "base:runtime"
+import types "globals"
+import screens "screens"
 import rl "vendor:raylib"
+
 
 // Config flag passed from build script
 ANDROID :: #config(ANDROID, false)
@@ -29,20 +32,57 @@ when ANDROID {
 
 // SHARED GAME LOGIC
 game_run :: proc() {
-	width := rl.GetScreenWidth()
-	height := rl.GetScreenHeight()
-	fontSize: i32 = i32(width) / 20
+	global_context := types.Context {
+		score          = 0,
+		rally_count    = 0,
+		score_point    = 1,
 
+		//
+		ball_speed     = 0.50,
+		paddle_speed   = 0.50,
+
+		//
+		title          = "PING PONG",
+		win_limit      = 3,
+
+		//
+		level          = .EASY,
+		game_mode      = .MULTIPLAYER,
+		current_screen = .HOME_SCREEN,
+	}
+
+	types.load_settings(&global_context)
+
+	rl.InitAudioDevice()
 	rl.SetTargetFPS(60)
+	screens.gameplay_init(&global_context)
 
-	for !rl.WindowShouldClose() {
+	for (!rl.WindowShouldClose()) {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RAYWHITE)
-		rl.DrawCircle(width / 2, height / 2, f32(width) / 4, rl.MAROON)
-		rl.DrawText("IT WORKS!", 50, height / 2 - 50, fontSize, rl.WHITE)
-		rl.DrawFPS(20, 20)
+
+		switch global_context.current_screen {
+		case .HOME_SCREEN:
+			screens.draw_home(&global_context)
+		case .GAMEPLAY:
+			screens.gameplay_update(&global_context)
+			screens.gameplay_draw(&global_context)
+			if rl.IsKeyPressed(.SPACE) || rl.IsKeyPressed(.ESCAPE) {
+				global_context.current_screen = .PAUSE_SCREEN
+			}
+		case .SETTINGS:
+			screens.draw_settings(&global_context)
+		case .PAUSE_SCREEN:
+			screens.gameplay_draw(&global_context) // Keep drawing game state underneath
+			screens.draw_pause(&global_context)
+		case .GAME_OVER:
+			screens.draw_game_over(&global_context)
+		}
+
 		rl.EndDrawing()
 	}
 
+	types.save_settings(&global_context)
+	rl.CloseAudioDevice()
 	rl.CloseWindow()
 }
