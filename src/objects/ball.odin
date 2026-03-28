@@ -8,7 +8,7 @@ create_ball :: proc(ctx: ^types.Context) -> types.Ball {
 		dir      = f32(rl.GetRandomValue(5, 355)),
 		speed    = ctx.ball_speed,
 		radius   = 0.025 * f32(rl.GetRenderHeight()),
-		color    = rl.RAYWHITE,
+		color    = rl.GRAY,
 		position = rl.Vector2{f32(rl.GetRenderWidth()) / 2, f32(rl.GetRenderHeight()) / 2},
 	}
 	return temp

@@ -7,7 +7,7 @@ create_paddle :: proc(isPlayer1: bool, ctx: ^types.Context) -> types.Paddle {
 	temp := types.Paddle {
 		dir      = 0,
 		score    = 0,
-		color    = rl.WHITE,
+		color    = rl.BLACK,
 		speed    = ctx.paddle_speed * f32(rl.GetRenderHeight()),
 		size     = rl.Vector2{30, f32(rl.GetRenderHeight()) * 0.3},
 
