@@ -16,35 +16,63 @@ gameplay_init :: proc(ctx: ^types.Context) {
 }
 
 gameplay_draw :: proc(ctx: ^types.Context) {
+	screen_w := f32(rl.GetScreenWidth())
+	screen_h := f32(rl.GetScreenHeight())
+
+	// === GAME OBJECTS ===
 	objects.draw_paddle(&player1)
 	objects.draw_paddle(&player2)
 	objects.draw_ball(&ball)
 
-	title_font_size: i32 = 30
-	title_width := rl.MeasureText(rl.TextFormat(ctx.title), title_font_size)
+	// === HUD LAYOUT CONSTANTS ===
+	top_margin := screen_h * 0.03
+	center_x := screen_w / 2
 
-	rattle_font_size: i32 = 30
-	rattle_width := rl.MeasureText(rl.TextFormat("Rattle - %d", ctx.rally_count), rattle_font_size)
+	title_font := i32(screen_h * 0.035)
+	rally_font := i32(screen_h * 0.03)
+	score_font := i32(screen_h * 0.04)
 
-	scores_font_size: i32 = 20
-	paddle1_score_width := rl.MeasureText(rl.TextFormat("%d", player1.score), scores_font_size)
-	paddle2_score_width := rl.MeasureText(rl.TextFormat("%d", player2.score), scores_font_size)
+	// === TITLE ===
+	title_w := rl.MeasureText(ctx.title, title_font)
 
-	rl.DrawText(ctx.title, (rl.GetRenderWidth() - title_width) / 2, 10, title_font_size, rl.ORANGE)
 	rl.DrawText(
-		rl.TextFormat("Rattle - %d", ctx.rally_count),
-		(rl.GetRenderWidth() - rattle_width) / 2,
-		35,
-		rattle_font_size,
+		ctx.title,
+		i32(center_x - f32(title_w) / 2),
+		i32(top_margin),
+		title_font,
 		rl.ORANGE,
 	)
 
-	rl.DrawText(rl.TextFormat("%d", player1.score), 20, 23, scores_font_size, rl.ORANGE)
+	// === RALLY COUNT ===
+	rally_text := rl.TextFormat("Rally - %d", ctx.rally_count)
+	rally_w := rl.MeasureText(rally_text, rally_font)
+
 	rl.DrawText(
-		rl.TextFormat("%d", player2.score),
-		rl.GetRenderWidth() - 20,
-		23,
-		scores_font_size,
+		rally_text,
+		i32(center_x - f32(rally_w) / 2),
+		i32(top_margin + screen_h * 0.04),
+		rally_font,
+		rl.ORANGE,
+	)
+
+	// === SCORES ===
+	p1_text := rl.TextFormat("%d", player1.score)
+	p2_text := rl.TextFormat("%d", player2.score)
+
+	p1_w := rl.MeasureText(p1_text, score_font)
+	p2_w := rl.MeasureText(p2_text, score_font)
+
+	padding := screen_w * 0.03
+
+	// Left (Player 1)
+	rl.DrawText(p1_text, i32(padding), i32(top_margin), score_font, rl.ORANGE)
+
+	// Right (Player 2) — FIXED alignment
+	rl.DrawText(
+		p2_text,
+		i32(screen_w - padding - f32(p2_w)),
+		i32(top_margin),
+		score_font,
 		rl.ORANGE,
 	)
 }
