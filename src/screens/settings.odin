@@ -5,8 +5,6 @@ import rl "vendor:raylib"
 // ping_pong/screens/settings.odin
 
 draw_settings :: proc(ctx: ^types.Context) {
-	rl.ClearBackground(rl.BLACK)
-
 	// Title
 	font_size: i32 = 30
 	title_width := rl.MeasureText("SETTINGS", font_size)

@@ -5,8 +5,6 @@ import types "../globals"
 import rl "vendor:raylib"
 
 draw_home :: proc(ctx: ^types.Context) {
-	rl.ClearBackground(rl.BLACK)
-
 	// Title Rendering
 	title: cstring = ctx.title
 	font_size: i32 = 40

@@ -5,7 +5,6 @@ import types "../globals"
 import rl "vendor:raylib"
 
 draw_game_over :: proc(ctx: ^types.Context) {
-	rl.ClearBackground(rl.BLACK)
 
 	// Show Winner
 	font_size: i32 = 40
