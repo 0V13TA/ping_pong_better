@@ -1,0 +1,4 @@
+high_score 0
+win_limit 3
+level 0
+mode 0

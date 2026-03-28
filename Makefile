@@ -43,8 +43,8 @@ clean:
 # 5. Run the Linux binary
 run: linux
 	@echo "-> Running..."
-	./$(BUILD_DIR)/linux/$(NAME)_linux.bin
+	./$(BUILD_DIR)/$(NAME)_linux.bin
 
 # 6. Install to Android Device (Shortcut)
 install:
-	adb install -r ./${BUILD_DIR}/android/$(NAME)_android.apk
+	adb install -r ./${BUILD_DIR}/android/game.apk
