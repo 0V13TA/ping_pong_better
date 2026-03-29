@@ -52,9 +52,16 @@ game_run :: proc() {
 	}
 
 	types.load_settings(&global_context)
+	defer types.save_settings(&global_context)
 
 	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+
 	rl.SetTargetFPS(60)
+
+	font := rl.LoadFont("assets/JetBrainsMono-Bold.ttf")
+	defer rl.UnloadFont(font)
+
 	screens.gameplay_init(&global_context)
 
 	for (!rl.WindowShouldClose()) {
@@ -82,7 +89,5 @@ game_run :: proc() {
 		rl.EndDrawing()
 	}
 
-	types.save_settings(&global_context)
-	rl.CloseAudioDevice()
 	rl.CloseWindow()
 }
