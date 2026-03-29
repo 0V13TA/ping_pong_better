@@ -75,6 +75,35 @@ gameplay_draw :: proc(ctx: ^types.Context) {
 		score_font,
 		rl.ORANGE,
 	)
+
+	// --- MOBILE PAUSE BUTTON ---
+	// Define button size and position (Top Right is usually best for fingers)
+	btn_size := screen_h * 0.1
+	btn_padding := screen_h * 0.02
+	btn_rect := rl.Rectangle{screen_w - btn_size - btn_padding, btn_padding, btn_size, btn_size}
+
+	// Draw a minimalist box
+	rl.DrawRectangleLinesEx(btn_rect, 2, rl.BLACK)
+
+	// Draw "||" symbol centered in the box
+	symbol_size := i32(btn_size * 0.6)
+	symbol_w := rl.MeasureText("||", symbol_size)
+	rl.DrawText(
+		"||",
+		i32(btn_rect.x + (btn_size - f32(symbol_w)) / 2),
+		i32(btn_rect.y + (btn_size - f32(symbol_size)) / 2),
+		symbol_size,
+		rl.BLACK,
+	)
+
+	// --- BUTTON LOGIC ---
+	// Check for mouse click or touch tap
+	if rl.IsMouseButtonPressed(.LEFT) {
+		mouse_pos := rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mouse_pos, btn_rect) {
+			ctx.current_screen = .PAUSE_SCREEN
+		}
+	}
 }
 
 gameplay_update :: proc(ctx: ^types.Context) {

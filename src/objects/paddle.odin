@@ -86,7 +86,7 @@ update_paddle :: proc(ctx: ^types.Context, paddle: ^types.Paddle, ball: ^types.B
 		error_margin: f32 = 0
 		if ctx.level == .EASY {
 			error_margin = 50.0 // The AI might target 50px above or below the actual spot
-		} else if ctx.level == .MEDIUM {
+		} else if ctx.level == .NORMAL {
 			error_margin = 20.0
 		}
 
