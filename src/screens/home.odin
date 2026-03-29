@@ -66,6 +66,64 @@ draw_home :: proc(ctx: ^types.Context) {
 	}
 }
 
+// Inside gameplay_draw
+draw_scoreboard :: proc(p1_score, p2_score: i32) {
+	sw := f32(rl.GetScreenWidth())
+	sh := f32(rl.GetScreenHeight())
+
+	fs := i32(sh * 0.15) // Large but thin
+	spacing := sw * 0.1
+
+	// Draw scores with a very light gray so they feel like part of the background
+	s1 := rl.TextFormat("%d", p1_score)
+	s2 := rl.TextFormat("%d", p2_score)
+
+	color := rl.Fade(rl.LIGHTGRAY, 0.4)
+
+	rl.DrawText(s1, i32(sw / 2 - spacing - f32(rl.MeasureText(s1, fs))), i32(sh * 0.1), fs, color)
+	rl.DrawText(s2, i32(sw / 2 + spacing), i32(sh * 0.1), fs, color)
+
+	// Draw a thin vertical divider line
+	rl.DrawLineEx({sw / 2, sh * 0.1}, {sw / 2, sh * 0.25}, 1.0, color)
+}
+
+// src/screens/gameplay.odin
+
+draw_pause_button :: proc(ctx: ^types.Context) {
+	sw := f32(rl.GetScreenWidth())
+	sh := f32(rl.GetScreenHeight())
+
+	// 1. Position it at the top-center to be reachable but out of the way
+	btn_w := sw * 0.12
+	btn_h := sh * 0.08
+	rect := rl.Rectangle{(sw - btn_w) / 2, sh * 0.02, btn_w, btn_h}
+
+	// 2. Interaction Logic (Raylib treats first touch as mouse)
+	mouse_pos := rl.GetMousePosition()
+	is_hovered := rl.CheckCollisionPointRec(mouse_pos, rect)
+
+	// Minimalist CSS-style: Change opacity or border thickness on hover
+	color := is_hovered ? rl.BLACK : rl.Fade(rl.BLACK, 0.3)
+	thickness: f32 = is_hovered ? 3.0 : 1.5
+
+	// 3. Draw "Ghost" Button
+	rl.DrawRectangleLinesEx(rect, thickness, color)
+
+	// Center the text "PAUSE" or "||" inside
+	fs := i32(btn_h * 0.5)
+	tw := rl.MeasureText("PAUSE", fs)
+	rl.DrawText(
+		"PAUSE",
+		i32(rect.x + (btn_w - f32(tw)) / 2),
+		i32(rect.y + (btn_h - f32(fs)) / 2),
+		fs,
+		color,
+	)
+
+	if is_hovered && rl.IsMouseButtonPressed(.LEFT) {
+		ctx.current_screen = .PAUSE_SCREEN
+	}
+}
 
 gui_button :: proc(label: cstring, y: f32) -> bool {
 	screen_w := f32(rl.GetScreenWidth())

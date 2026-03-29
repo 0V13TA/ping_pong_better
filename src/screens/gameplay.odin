@@ -15,95 +15,32 @@ gameplay_init :: proc(ctx: ^types.Context) {
 	ball = objects.create_ball(ctx)
 }
 
-gameplay_draw :: proc(ctx: ^types.Context) {
-	screen_w := f32(rl.GetScreenWidth())
-	screen_h := f32(rl.GetScreenHeight())
 
-	// === GAME OBJECTS ===
+// src/screens/gameplay.odin
+
+gameplay_draw :: proc(ctx: ^types.Context) {
+	// rl.ClearBackground(rl.RAYWHITE) // Minimalist light background
+
+	// 1. Background Elements (Score)
+	// We draw these first so paddles/ball appear on top
+	draw_scoreboard(player1.score, player2.score)
+
+	// 2. The Court (Optional minimalist center line)
+	rl.DrawLineEx(
+		{f32(rl.GetScreenWidth()) / 2, 0},
+		{f32(rl.GetScreenWidth()) / 2, f32(rl.GetScreenHeight())},
+		1.0,
+		rl.Fade(rl.GRAY, 0.2),
+	)
+
+
+	// 3. === GAME OBJECTS ===
 	objects.draw_paddle(&player1)
 	objects.draw_paddle(&player2)
 	objects.draw_ball(&ball)
 
-	// === HUD LAYOUT CONSTANTS ===
-	top_margin := screen_h * 0.03
-	center_x := screen_w / 2
-
-	title_font := i32(screen_h * 0.035)
-	rally_font := i32(screen_h * 0.03)
-	score_font := i32(screen_h * 0.04)
-
-	// === TITLE ===
-	title_w := rl.MeasureText(ctx.title, title_font)
-
-	rl.DrawText(
-		ctx.title,
-		i32(center_x - f32(title_w) / 2),
-		i32(top_margin),
-		title_font,
-		rl.ORANGE,
-	)
-
-	// === RALLY COUNT ===
-	rally_text := rl.TextFormat("Rally - %d", ctx.rally_count)
-	rally_w := rl.MeasureText(rally_text, rally_font)
-
-	rl.DrawText(
-		rally_text,
-		i32(center_x - f32(rally_w) / 2),
-		i32(top_margin + screen_h * 0.04),
-		rally_font,
-		rl.ORANGE,
-	)
-
-	// === SCORES ===
-	p1_text := rl.TextFormat("%d", player1.score)
-	p2_text := rl.TextFormat("%d", player2.score)
-
-	p1_w := rl.MeasureText(p1_text, score_font)
-	p2_w := rl.MeasureText(p2_text, score_font)
-
-	padding := screen_w * 0.03
-
-	// Left (Player 1)
-	rl.DrawText(p1_text, i32(padding), i32(top_margin), score_font, rl.ORANGE)
-
-	// Right (Player 2) — FIXED alignment
-	rl.DrawText(
-		p2_text,
-		i32(screen_w - padding - f32(p2_w)),
-		i32(top_margin),
-		score_font,
-		rl.ORANGE,
-	)
-
-	// --- MOBILE PAUSE BUTTON ---
-	// Define button size and position (Top Right is usually best for fingers)
-	btn_size := screen_h * 0.1
-	btn_padding := screen_h * 0.02
-	btn_rect := rl.Rectangle{screen_w - btn_size - btn_padding, btn_padding, btn_size, btn_size}
-
-	// Draw a minimalist box
-	rl.DrawRectangleLinesEx(btn_rect, 2, rl.BLACK)
-
-	// Draw "||" symbol centered in the box
-	symbol_size := i32(btn_size * 0.6)
-	symbol_w := rl.MeasureText("||", symbol_size)
-	rl.DrawText(
-		"||",
-		i32(btn_rect.x + (btn_size - f32(symbol_w)) / 2),
-		i32(btn_rect.y + (btn_size - f32(symbol_size)) / 2),
-		symbol_size,
-		rl.BLACK,
-	)
-
-	// --- BUTTON LOGIC ---
-	// Check for mouse click or touch tap
-	if rl.IsMouseButtonPressed(.LEFT) {
-		mouse_pos := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mouse_pos, btn_rect) {
-			ctx.current_screen = .PAUSE_SCREEN
-		}
-	}
+	// 4. The UI Layer (Pause Button)
+	draw_pause_button(ctx)
 }
 
 gameplay_update :: proc(ctx: ^types.Context) {
