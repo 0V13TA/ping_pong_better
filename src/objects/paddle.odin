@@ -80,17 +80,41 @@ update_paddle :: proc(ctx: ^types.Context, paddle: ^types.Paddle, ball: ^types.B
 	// AI LOGIC for Player 2 in Single Player Mode
 	if ctx.game_mode == .SINGLE_PLAYER && is_player2 {
 		target_y := get_ai_target_y(ball, paddle.position.x)
+
+		// --- ADDED: Error Margin based on difficulty ---
+		// On Easy, the AI "aims" for a spot slightly off-center of the ball
+		error_margin: f32 = 0
+		if ctx.level == .EASY {
+			error_margin = 50.0 // The AI might target 50px above or below the actual spot
+		} else if ctx.level == .MEDIUM {
+			error_margin = 20.0
+		}
+
+		// Only update target if the ball is moving towards the AI
+		// This simulates "Reaction Time"
 		paddle_center := paddle.position.y + (paddle.size.y / 2)
 
-		// Add a "Dead Zone" based on difficulty to prevent jitter
 		dead_zone: f32 = 10.0
-		if ctx.level == .EASY do dead_zone = 40.0
+		if ctx.level == .EASY do dead_zone = 60.0 // Very lazy AI
 		if ctx.level == .HARD do dead_zone = 5.0
 
 		if math.abs(target_y - paddle_center) > dead_zone {
 			if target_y < paddle_center do paddle.dir = -1
 			else do paddle.dir = 1
 		}
+
+		// --- ADDED: Speed Cap ---
+		// Make the AI paddle move slower than the player's potential
+		// especially on Easy mode so it physically can't keep up with fast balls.
+		ai_speed_multiplier: f32 = 1.0
+		if ctx.level == .EASY do ai_speed_multiplier = 0.5
+
+		paddle.position.y +=
+			f32(paddle.dir) *
+			(ctx.paddle_speed * ai_speed_multiplier) *
+			f32(rl.GetRenderHeight()) *
+			dt
+
 	} else {
 		// MANUAL CONTROLS (Keyboard)
 		if (rl.IsKeyDown(paddle.controls.up)) do paddle.dir = -1
