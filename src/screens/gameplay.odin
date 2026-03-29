@@ -34,6 +34,25 @@ gameplay_draw :: proc(ctx: ^types.Context) {
 	)
 
 
+	// 3. Current Rally Count (Top Center)
+	screen_w := f32(rl.GetScreenWidth())
+	screen_h := f32(rl.GetScreenHeight())
+
+	rally_text := rl.TextFormat("RALLY: %d", ctx.rally_count)
+	// Use a size relative to screen height for responsiveness
+	rally_font_size := i32(screen_h * 0.05)
+	rally_w := rl.MeasureText(rally_text, rally_font_size)
+
+	// Position it slightly below the top edge
+	rl.DrawText(
+		rally_text,
+		i32((screen_w - f32(rally_w)) / 2),
+		i32(screen_h * 0.12), // Adjusted to not overlap your new Pause button
+		rally_font_size,
+		rl.DARKGRAY,
+	)
+
+
 	// 3. === GAME OBJECTS ===
 	objects.draw_paddle(&player1)
 	objects.draw_paddle(&player2)
