@@ -9,7 +9,7 @@ player1: types.Paddle
 player2: types.Paddle
 ball: types.Ball
 gameplay_init :: proc(ctx: ^types.Context) {
-	ctx.hit_sound = rl.LoadSound("assets/sounds_ping_pong_8bit/ping_pong_8bit_plop.ogg")
+	ctx.hit_sound = rl.LoadSound("sounds_ping_pong_8bit/ping_pong_8bit_plop.ogg")
 	player1 = objects.create_paddle(true, ctx)
 	player2 = objects.create_paddle(false, ctx)
 	ball = objects.create_ball(ctx)

@@ -51,6 +51,7 @@ game_run :: proc() {
 		current_screen = .HOME_SCREEN,
 	}
 
+	rl.ChangeDirectory("assets")
 	types.load_settings(&global_context)
 	defer types.save_settings(&global_context)
 
@@ -58,9 +59,6 @@ game_run :: proc() {
 	defer rl.CloseAudioDevice()
 
 	rl.SetTargetFPS(60)
-
-	font := rl.LoadFont("assets/JetBrainsMono-Bold.ttf")
-	defer rl.UnloadFont(font)
 
 	screens.gameplay_init(&global_context)
 
