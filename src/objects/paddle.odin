@@ -97,16 +97,26 @@ update_paddle :: proc(ctx: ^types.Context, paddle: ^types.Paddle, ball: ^types.B
 		if (rl.IsKeyDown(paddle.controls.down)) do paddle.dir = 1
 
 		// MOUSE/TOUCH Support
-		if rl.IsMouseButtonDown(.LEFT) {
-			mouse_pos := rl.GetMousePosition()
-			screen_width := f32(rl.GetRenderWidth())
-			is_left_paddle := paddle.position.x < screen_width / 2
-			touch_is_left := mouse_pos.x < screen_width / 2
+		touch_count := rl.GetTouchPointCount()
+		screen_w := f32(rl.GetScreenWidth())
 
-			if (is_left_paddle && touch_is_left) || (!is_left_paddle && !touch_is_left) {
-				paddle.position.y = mouse_pos.y - (paddle.size.y / 2)
+		for i in 0 ..< touch_count {
+			touch_pos := rl.GetTouchPosition(i)
+
+			// Is this the left or right paddle?
+			is_left_paddle := paddle.position.x < screen_w / 2
+			// Is the finger on the left or right side?
+			touch_on_left := touch_pos.x < screen_w / 2
+
+			// Match them up
+			if is_left_paddle == touch_on_left {
+				// Only move if it's not a CPU paddle in single player
+				if !(ctx.game_mode == .SINGLE_PLAYER && !is_left_paddle) {
+					paddle.position.y = touch_pos.y - (paddle.size.y / 2)
+				}
 			}
 		}
+
 	}
 
 	// Apply movement and clamp
