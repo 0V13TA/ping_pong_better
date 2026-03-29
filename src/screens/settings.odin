@@ -38,12 +38,14 @@ draw_settings :: proc(ctx: ^types.Context) {
 		case .HARD:
 			ctx.level = .EASY
 		}
+		types.save_settings(ctx) // Save immediately to persist mode changes
 	}
 
 	// --- MODE ---
 	mode_label := rl.TextFormat("MODE: %v", ctx.game_mode)
 	if gui_button(mode_label, start_y + gap) {
 		ctx.game_mode = (ctx.game_mode == .SINGLE_PLAYER) ? .MULTIPLAYER : .SINGLE_PLAYER
+		types.save_settings(ctx) // Save immediately to persist mode changes
 	}
 
 	// --- WIN LIMIT ---
@@ -51,6 +53,7 @@ draw_settings :: proc(ctx: ^types.Context) {
 	if gui_button(limit_label, start_y + gap * 2) {
 		ctx.win_limit += 2
 		if ctx.win_limit > 11 do ctx.win_limit = 1
+		types.save_settings(ctx) // Save immediately to persist mode changes
 	}
 
 	// === SEPARATOR (visual grouping) ===
