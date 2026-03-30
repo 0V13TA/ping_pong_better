@@ -36,6 +36,7 @@ game_run :: proc() {
 		score          = 0,
 		rally_count    = 0,
 		score_point    = 1,
+		highest_rally  = 0,
 
 		//
 		ball_speed     = 0.50,

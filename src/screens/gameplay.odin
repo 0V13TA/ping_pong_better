@@ -2,6 +2,7 @@ package screens
 
 import types "../globals"
 import objects "../objects/"
+import "core:math"
 import rl "vendor:raylib"
 
 
@@ -21,11 +22,11 @@ gameplay_init :: proc(ctx: ^types.Context) {
 gameplay_draw :: proc(ctx: ^types.Context) {
 	// rl.ClearBackground(rl.RAYWHITE) // Minimalist light background
 
-	// 1. Background Elements (Score)
+	// Background Elements (Score)
 	// We draw these first so paddles/ball appear on top
 	draw_scoreboard(player1.score, player2.score)
 
-	// 2. The Court (Optional minimalist center line)
+	// The Court (Optional minimalist center line)
 	rl.DrawLineEx(
 		{f32(rl.GetScreenWidth()) / 2, 0},
 		{f32(rl.GetScreenWidth()) / 2, f32(rl.GetScreenHeight())},
@@ -34,7 +35,7 @@ gameplay_draw :: proc(ctx: ^types.Context) {
 	)
 
 
-	// 3. Current Rally Count (Top Center)
+	// Current Rally Count (Top Center)
 	screen_w := f32(rl.GetScreenWidth())
 	screen_h := f32(rl.GetScreenHeight())
 
@@ -52,13 +53,29 @@ gameplay_draw :: proc(ctx: ^types.Context) {
 		rl.DARKGRAY,
 	)
 
+	// "NEW RECORD" Alert
+	if ctx.record_anim_timer > 0 {
+		record_text: cstring = "NEW RECORD!"
+		record_fs := i32(screen_h * 0.04)
+		record_w := rl.MeasureText(record_text, record_fs)
 
-	// 3. === GAME OBJECTS ===
+		// Make it pulse or fade using the timer
+		alpha := math.clamp(ctx.record_anim_timer, 0, 1)
+		rl.DrawText(
+			record_text,
+			i32((screen_w - f32(record_w)) / 2),
+			i32(screen_h * 0.46),
+			record_fs,
+			rl.Fade(rl.GOLD, alpha),
+		)
+	}
+
+	// === GAME OBJECTS ===
 	objects.draw_paddle(&player1)
 	objects.draw_paddle(&player2)
 	objects.draw_ball(&ball)
 
-	// 4. The UI Layer (Pause Button)
+	// The UI Layer (Pause Button)
 	draw_pause_button(ctx)
 }
 
@@ -77,6 +94,17 @@ gameplay_update :: proc(ctx: ^types.Context) {
 		// Default speeds defined in your main.odin
 		ctx.ball_speed = 0.50
 		ctx.paddle_speed = 0.50
+	}
+
+	// Update High Score and trigger animation
+	if ctx.rally_count > ctx.highest_rally {
+		ctx.highest_rally = ctx.rally_count
+		ctx.record_anim_timer = 2.0 // Show message for 2 seconds
+	}
+
+	// Countdown the timer
+	if ctx.record_anim_timer > 0 {
+		ctx.record_anim_timer -= rl.GetFrameTime()
 	}
 
 	objects.update_paddle(ctx, &player1, &ball)

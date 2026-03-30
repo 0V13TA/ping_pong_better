@@ -25,8 +25,8 @@ draw_home :: proc(ctx: ^types.Context) {
 	// === SCORES ===
 	score_font := i32(screen_h * 0.03)
 
-	score_text := rl.TextFormat("Last Score: %d", ctx.score)
-	high_text := rl.TextFormat("High Score: %d", ctx.rally_count)
+	score_text := rl.TextFormat("Last Rally: %d", ctx.score)
+	high_text := rl.TextFormat("Highest Rally: %d", ctx.highest_rally)
 
 	score_w := rl.MeasureText(score_text, score_font)
 	high_w := rl.MeasureText(high_text, score_font)
@@ -67,24 +67,22 @@ draw_home :: proc(ctx: ^types.Context) {
 }
 
 // Inside gameplay_draw
+// Use this in screens/gameplay.odin or home.odin
 draw_scoreboard :: proc(p1_score, p2_score: i32) {
 	sw := f32(rl.GetScreenWidth())
 	sh := f32(rl.GetScreenHeight())
 
-	fs := i32(sh * 0.15) // Large but thin
-	spacing := sw * 0.1
+	fs := i32(sh * 0.25) // Very large background numbers
+	spacing := sw * 0.15
 
-	// Draw scores with a very light gray so they feel like part of the background
 	s1 := rl.TextFormat("%d", p1_score)
 	s2 := rl.TextFormat("%d", p2_score)
 
-	color := rl.Fade(rl.LIGHTGRAY, 0.4)
+	// Very faint light gray so it's readable but doesn't distract
+	color := rl.Fade(rl.BLACK, 0.15)
 
-	rl.DrawText(s1, i32(sw / 2 - spacing - f32(rl.MeasureText(s1, fs))), i32(sh * 0.1), fs, color)
-	rl.DrawText(s2, i32(sw / 2 + spacing), i32(sh * 0.1), fs, color)
-
-	// Draw a thin vertical divider line
-	rl.DrawLineEx({sw / 2, sh * 0.1}, {sw / 2, sh * 0.25}, 1.0, color)
+	rl.DrawText(s1, i32(sw / 2 - spacing - f32(rl.MeasureText(s1, fs))), i32(sh * 0.3), fs, color)
+	rl.DrawText(s2, i32(sw / 2 + spacing), i32(sh * 0.3), fs, color)
 }
 
 // src/screens/gameplay.odin

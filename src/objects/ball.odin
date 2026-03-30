@@ -51,6 +51,7 @@ update_ball :: proc(
 		if paddle2.score >= ctx.win_limit {
 			ctx.winner_name = "PLAYER 2 WINS!"
 			ctx.current_screen = .GAME_OVER
+			types.save_settings(ctx)
 		} else {
 			// Reset ball to center for next point
 			ball.position = {f32(rl.GetRenderWidth()) / 2, f32(rl.GetRenderHeight()) / 2}
@@ -61,6 +62,7 @@ update_ball :: proc(
 		if paddle1.score >= ctx.win_limit {
 			ctx.winner_name = "PLAYER 1 WINS!"
 			ctx.current_screen = .GAME_OVER
+			types.save_settings(ctx)
 		} else {
 			ball.position = {f32(rl.GetRenderWidth()) / 2, f32(rl.GetRenderHeight()) / 2}
 			ball.dir = f32(rl.GetRandomValue(-30, 30))

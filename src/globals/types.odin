@@ -22,19 +22,20 @@ Mode :: enum {
 }
 
 Context :: struct {
-	score:          i32,
-	rally_count:    i32,
-	ball_speed:     f32,
-	paddle_speed:   f32,
-	score_point:    i32,
-	win_limit:      i32,
-	winner_name:    cstring,
-	game_mode:      Mode,
-	level:          Level,
-	current_screen: Screen,
-	hit_sound:      rl.Sound,
-	title:          cstring,
-	highest_rally:  i32,
+	score:             i32,
+	rally_count:       i32,
+	ball_speed:        f32,
+	paddle_speed:      f32,
+	score_point:       i32,
+	win_limit:         i32,
+	winner_name:       cstring,
+	game_mode:         Mode,
+	level:             Level,
+	current_screen:    Screen,
+	hit_sound:         rl.Sound,
+	title:             cstring,
+	highest_rally:     i32,
+	record_anim_timer: f32,
 }
 
 // NOTE: The way I plan on handling this, is to
