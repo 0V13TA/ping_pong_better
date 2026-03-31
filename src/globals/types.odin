@@ -3,6 +3,9 @@ import rl "vendor:raylib"
 
 // Config flag passed from build script
 ANDROID :: #config(ANDROID, false)
+PACKAGE_NAME :: "com.raylib.game"
+ANDROID_PATH :: "/data/data/com.raylib.game/"
+ANDROID_PATH_FALLBACK :: "/storage/emulated/0/Android/data/com.raylib.game/"
 
 Screen :: enum {
 	GAMEPLAY,

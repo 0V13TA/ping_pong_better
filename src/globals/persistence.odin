@@ -1,12 +1,12 @@
 // ping_pong/globals/persistence.odin
 package globals
 
+import types "../globals"
 import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
-foreign import rl "vendor:raylib"
-GetStoragePath :: proc() -> cstring
+import rl "vendor:raylib"
 
 SAVE_FILE :: "settings.txt"
 HIGHEST_RALLY :: "highest_rally"
@@ -15,27 +15,31 @@ LEVEL :: "level"
 MODE :: "mode"
 
 save_settings :: proc(ctx: ^Context) {
-	path := SAVE_FILE
 	when ANDROID {
-		// Use the internal storage path where we have write permissions
-		app := rl.GetAndroidApp()
-		if app != nil {
-			path = fmt.tprintf("%s/%s", app.activity.internalDataPath, SAVE_FILE)
+		path := strings.concatenate({ANDROID_PATH, SAVE_FILE})
+
+		f, err := os.open(path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
+
+		if err != os.ERROR_NONE {
+			path = strings.concatenate({ANDROID_PATH_FALLBACK, SAVE_FILE})
+			f, err = os.open(path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
+
+			if err != os.ERROR_NONE {
+				rl.TraceLog(.ERROR, "Nigga I didn't save")
+				return
+			}
 		}
+		defer os.close(f)
 	}
 
-	// Convert string to cstring for Raylib's TraceLog
-	path_cstr := strings.clone_to_cstring(path, context.temp_allocator)
-	rl.TraceLog(.INFO, rl.TextFormat("Saving settings to: %s", path_cstr))
-	rl.TraceLog(.INFO, "%d", ANDROID)
+	when !ANDROID {
+		f, err := os.open(SAVE_FILE, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
 
-
-	f, err := os.open(path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
-	if err != os.ERROR_NONE {
-		rl.TraceLog(.ERROR, "Nigga I can't save this file")
-		return
+		if err != os.ERROR_NONE {
+			return
+		}
+		defer os.close(f)
 	}
-	defer os.close(f)
 
 	// Write values in "name value" format
 	fmt.fprintf(f, "%s %d\n", HIGHEST_RALLY, ctx.highest_rally)
@@ -45,29 +49,32 @@ save_settings :: proc(ctx: ^Context) {
 }
 
 load_settings :: proc(ctx: ^Context) {
-	path := SAVE_FILE
+
 	when ANDROID {
-		// Use the internal storage path where we have write permissions
-		app := rl.GetAndroidApp()
-		rl.Getpath
-		if app != nil {
-			path = fmt.tprintf("%s/%s", app.activity.internalDataPath, SAVE_FILE)
+		path := strings.concatenate({ANDROID_PATH, SAVE_FILE})
+
+		data, ok := os.read_entire_file(path)
+		if !ok {
+			path = strings.concatenate({types.ANDROID_PATH_FALLBACK, SAVE_FILE})
+			data, ok = os.read_entire_file(path)
+			if !ok {
+				fmt.println(path)
+				rl.TraceLog(.INFO, strings.clone_to_cstring(path))
+				rl.TraceLog(.ERROR, "Nigga I didn't load")
+				return
+			}
 		}
+		defer delete(data)
 	}
 
-	// Convert string to cstring for Raylib's TraceLog
-	path_cstr := strings.clone_to_cstring(path, context.temp_allocator)
-	rl.TraceLog(.INFO, rl.TextFormat("Loading settings to: %s", path_cstr))
-	rl.TraceLog(.INFO, rl.GetWorkingDirectory())
-	rl.TraceLog(.INFO, "%d", ANDROID)
-
-	fmt.println("Loading from path: %s", path)
-	data, ok := os.read_entire_file(path)
-	if !ok {
-		rl.TraceLog(.ERROR, "Nigga I Can't Read This File")
-		return
+	when !ANDROID {
+		data, ok := os.read_entire_file(SAVE_FILE)
+		if !ok {
+			fmt.println("I didn't load")
+			return
+		}
+		defer delete(data)
 	}
-	defer delete(data)
 
 	lines := strings.split(string(data), "\n")
 	defer delete(lines)
