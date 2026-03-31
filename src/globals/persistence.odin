@@ -5,6 +5,8 @@ import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
+foreign import rl "vendor:raylib"
+GetStoragePath :: proc() -> cstring
 
 SAVE_FILE :: "settings.txt"
 HIGHEST_RALLY :: "highest_rally"
@@ -13,10 +15,24 @@ LEVEL :: "level"
 MODE :: "mode"
 
 save_settings :: proc(ctx: ^Context) {
-	f, err := os.open(SAVE_FILE, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
+	path := SAVE_FILE
+	when ANDROID {
+		// Use the internal storage path where we have write permissions
+		app := rl.GetAndroidApp()
+		if app != nil {
+			path = fmt.tprintf("%s/%s", app.activity.internalDataPath, SAVE_FILE)
+		}
+	}
+
+	// Convert string to cstring for Raylib's TraceLog
+	path_cstr := strings.clone_to_cstring(path, context.temp_allocator)
+	rl.TraceLog(.INFO, rl.TextFormat("Saving settings to: %s", path_cstr))
+	rl.TraceLog(.INFO, "%d", ANDROID)
+
+
+	f, err := os.open(path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
 	if err != os.ERROR_NONE {
-		fmt.println("Nigga I can't save this file")
-		fmt.println(err)
+		rl.TraceLog(.ERROR, "Nigga I can't save this file")
 		return
 	}
 	defer os.close(f)
@@ -29,9 +45,26 @@ save_settings :: proc(ctx: ^Context) {
 }
 
 load_settings :: proc(ctx: ^Context) {
-	data, ok := os.read_entire_file(SAVE_FILE)
+	path := SAVE_FILE
+	when ANDROID {
+		// Use the internal storage path where we have write permissions
+		app := rl.GetAndroidApp()
+		rl.Getpath
+		if app != nil {
+			path = fmt.tprintf("%s/%s", app.activity.internalDataPath, SAVE_FILE)
+		}
+	}
+
+	// Convert string to cstring for Raylib's TraceLog
+	path_cstr := strings.clone_to_cstring(path, context.temp_allocator)
+	rl.TraceLog(.INFO, rl.TextFormat("Loading settings to: %s", path_cstr))
+	rl.TraceLog(.INFO, rl.GetWorkingDirectory())
+	rl.TraceLog(.INFO, "%d", ANDROID)
+
+	fmt.println("Loading from path: %s", path)
+	data, ok := os.read_entire_file(path)
 	if !ok {
-		fmt.println("Nigga I Can't Read This File")
+		rl.TraceLog(.ERROR, "Nigga I Can't Read This File")
 		return
 	}
 	defer delete(data)

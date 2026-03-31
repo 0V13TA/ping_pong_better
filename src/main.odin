@@ -1,24 +1,21 @@
 package main
 
 import "base:runtime"
+import "core:fmt"
 import types "globals"
 import screens "screens"
 import rl "vendor:raylib"
 
-
-// Config flag passed from build script
-ANDROID :: #config(ANDROID, false)
-
 // 1. DESKTOP ENTRY POINT
-when !ANDROID {
+when !types.ANDROID {
 	main :: proc() {
 		rl.InitWindow(800, 480, "Ping Pong Desktop")
 		game_run()
 	}
 }
 
-// 2. ANDROID ENTRY POINT
-when ANDROID {
+// 2. types.ANDROID ENTRY POINT
+when types.ANDROID {
 	AndroidApp :: struct {}
 
 	@(export)
@@ -52,7 +49,12 @@ game_run :: proc() {
 		current_screen = .HOME_SCREEN,
 	}
 
-	rl.ChangeDirectory("assets")
+	when !types.ANDROID {
+		if !rl.ChangeDirectory("assets") {
+			fmt.println("Warning: Could not find assets directory")
+		}
+	}
+
 	types.load_settings(&global_context)
 	defer types.save_settings(&global_context)
 

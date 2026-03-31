@@ -1,6 +1,9 @@
 package globals
 import rl "vendor:raylib"
 
+// Config flag passed from build script
+ANDROID :: #config(ANDROID, false)
+
 Screen :: enum {
 	GAMEPLAY,
 	SETTINGS,
