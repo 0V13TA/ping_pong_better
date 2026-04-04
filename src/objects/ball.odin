@@ -84,9 +84,6 @@ update_ball :: proc(
 		ball.dir = (hit_factor - 0.5) * 90.0
 
 		ctx.rally_count += 1
-		if ctx.rally_count > ctx.highest_rally {
-			ctx.highest_rally = ctx.rally_count
-		}
 	}
 
 	// logic for Player 2 (Right)
@@ -103,8 +100,5 @@ update_ball :: proc(
 		ball.dir = 180.0 - ((hit_factor - 0.5) * 90.0)
 
 		ctx.rally_count += 1
-		if ctx.rally_count > ctx.highest_rally {
-			ctx.highest_rally = ctx.rally_count
-		}
 	}
 }

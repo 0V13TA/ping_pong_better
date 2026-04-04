@@ -2,6 +2,7 @@ package screens
 
 import types "../globals"
 import objects "../objects/"
+import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
 
@@ -82,25 +83,30 @@ gameplay_draw :: proc(ctx: ^types.Context) {
 gameplay_update :: proc(ctx: ^types.Context) {
 	// Dynamic Speed Scaling
 	if ctx.rally_count >= 90 {
-		ctx.ball_speed = 0.90
-		ctx.paddle_speed = 0.90
+		ctx.ball_speed = 0.95
+		ctx.paddle_speed = 0.95
 	} else if ctx.rally_count >= 50 {
+		ctx.ball_speed = 0.85
+		ctx.paddle_speed = 0.85
+	} else if ctx.rally_count >= 20 {
 		ctx.ball_speed = 0.75
 		ctx.paddle_speed = 0.75
-	} else if ctx.rally_count >= 20 {
-		ctx.ball_speed = 0.65
-		ctx.paddle_speed = 0.65
 	} else {
 		// Default speeds defined in your main.odin
-		ctx.ball_speed = 0.50
-		ctx.paddle_speed = 0.50
+		ctx.ball_speed = 0.60
+		ctx.paddle_speed = 0.60
 	}
 
-	// Update High Score and trigger animation
+	// Update High Score
 	if ctx.rally_count > ctx.highest_rally {
 		ctx.highest_rally = ctx.rally_count
-		ctx.record_anim_timer = 2.0 // Show message for 2 seconds
+		// trigger animation
+		if !ctx.shown_highscore {
+			ctx.record_anim_timer = 2.0 // Show message for 2 seconds
+			ctx.shown_highscore = true
+		}
 	}
+
 
 	// Countdown the timer
 	if ctx.record_anim_timer > 0 {

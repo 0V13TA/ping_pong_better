@@ -36,5 +36,6 @@ draw_pause :: proc(ctx: ^types.Context) {
 
 	if gui_button("MAIN MENU", start_y + gap) {
 		ctx.current_screen = .HOME_SCREEN
+		types.save_settings(ctx)
 	}
 }

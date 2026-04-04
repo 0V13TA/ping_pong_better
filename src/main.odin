@@ -77,6 +77,7 @@ game_run :: proc() {
 			screens.gameplay_draw(&global_context)
 			if rl.IsKeyPressed(.SPACE) || rl.IsKeyPressed(.ESCAPE) {
 				global_context.current_screen = .PAUSE_SCREEN
+				types.save_settings(&global_context)
 			}
 		case .SETTINGS:
 			screens.draw_settings(&global_context)

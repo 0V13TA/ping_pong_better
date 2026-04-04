@@ -42,6 +42,7 @@ Context :: struct {
 	title:             cstring,
 	highest_rally:     i32,
 	record_anim_timer: f32,
+	shown_highscore:   bool,
 }
 
 // NOTE: The way I plan on handling this, is to

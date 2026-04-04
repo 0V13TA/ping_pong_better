@@ -1,4 +1,4 @@
-highest_rally 87
+highest_rally 12
 win_limit 3
 level 1
 mode 1

@@ -37,7 +37,7 @@ draw_paddle :: proc(paddle: ^types.Paddle) {
 }
 
 // Calculate where the ball will be when it reaches the paddle's X position
-get_ai_target_y :: proc(ball: ^types.Ball, paddle_x: f32) -> f32 {
+get_ai_target_y :: proc(ball: ^types.Ball, paddle_x, error_margin: f32) -> f32 {
 	// If the ball is moving away from the AI, stay at the center
 	rad := ball.dir * (3.14159 / 180.0)
 	vel_x := math.cos_f32(rad)
@@ -55,7 +55,7 @@ get_ai_target_y :: proc(ball: ^types.Ball, paddle_x: f32) -> f32 {
 	time := dist_x / vel_x
 
 	// Predicted Y without bounces
-	predicted_y := ball.position.y + (vel_y * time)
+	predicted_y := ball.position.y + (vel_y * time) + error_margin
 
 	// Account for wall bounces (Top/Bottom)
 	height := f32(rl.GetRenderHeight())
@@ -79,8 +79,6 @@ update_paddle :: proc(ctx: ^types.Context, paddle: ^types.Paddle, ball: ^types.B
 
 	// AI LOGIC for Player 2 in Single Player Mode
 	if ctx.game_mode == .SINGLE_PLAYER && is_player2 {
-		target_y := get_ai_target_y(ball, paddle.position.x)
-
 		// --- ADDED: Error Margin based on difficulty ---
 		// On Easy, the AI "aims" for a spot slightly off-center of the ball
 		error_margin: f32 = 0
@@ -89,6 +87,8 @@ update_paddle :: proc(ctx: ^types.Context, paddle: ^types.Paddle, ball: ^types.B
 		} else if ctx.level == .NORMAL {
 			error_margin = 20.0
 		}
+
+		target_y := get_ai_target_y(ball, paddle.position.x, error_margin)
 
 		// Only update target if the ball is moving towards the AI
 		// This simulates "Reaction Time"

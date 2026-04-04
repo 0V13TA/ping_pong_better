@@ -53,6 +53,7 @@ draw_home :: proc(ctx: ^types.Context) {
 	if gui_button("START GAME", start_y) {
 		ctx.score = 0
 		ctx.rally_count = 0
+		ctx.shown_highscore = false
 		gameplay_init(ctx)
 		ctx.current_screen = .GAMEPLAY
 	}
